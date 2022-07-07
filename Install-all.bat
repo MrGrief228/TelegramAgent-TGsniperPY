@@ -1,0 +1,9 @@
+pip install pip
+pip install opencv-python
+pip install numpy
+pip install pytelegrambotapi
+pip install colorama
+pip install datetime
+pip install pyautogui
+pip install pillow
+pip install keyboard

